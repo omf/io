@@ -9,7 +9,7 @@
 #ifndef _SHA1_H
 #define _SHA1_H
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #include <sys/types.h>
 typedef unsigned __int8 u_int8_t;
 typedef unsigned __int16 u_int16_t;
@@ -23,13 +23,17 @@ typedef unsigned int u_int;
 #define	SHA1_DIGEST_LENGTH		20
 #define	SHA1_DIGEST_STRING_LENGTH	(SHA1_DIGEST_LENGTH * 2 + 1)
 
+#include <sys/types.h>
+
 typedef struct {
 	u_int32_t state[5];
 	u_int64_t count;
 	u_int8_t buffer[SHA1_BLOCK_LENGTH];
 } SHA1_CTX;
 
-#ifndef _MSC_VER
+//#define sha1_ctx SHA1_CTX
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
 #include <sys/cdefs.h>
 #else
 #define __BEGIN_DECLS
