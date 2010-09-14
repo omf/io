@@ -122,8 +122,11 @@ SET(CPACK_PACKAGE_VERSION_MINOR "0")
 SET(CPACK_PACKAGE_VERSION_PATCH "0")
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY ${CPACK_PACKAGE_NAME})
 
-IF(WIN32 AND NOT CYGWIN)
-	STRING(REGEX REPLACE "\\\\" "\\\\\\\\" VC_INSTALL_PATH "$ENV{VCINSTALLDIR}")
+IF(WIN32)
+	IF(MSVC)
+		STRING(REGEX REPLACE "\\\\" "\\\\\\\\" VC_INSTALL_PATH "$ENV{VCINSTALLDIR}")
+		SET(VC_RUNTIME_REDIST_FILES "File '${VC_INSTALL_PATH}\\\\redist\\\\Debug_NonRedist\\\\x86\\\\Microsoft.VC90.DebugCRT\\\\*.*'")
+	ENDIF(MSVC)
 	
 	SET(CPACK_SET_DESTDIR "OFF")
 	SET(CPACK_NSIS_URL_INFO_ABOUT "http://www.iolanguage.com")
@@ -133,7 +136,8 @@ IF(WIN32 AND NOT CYGWIN)
 		WriteIniStr '\$INSTDIR\\\\IoLanguageWebSite.url' 'InternetShortcut' 'URL' '${CPACK_NSIS_URL_INFO_ABOUT}'
 		SetOutPath '\$INSTDIR\\\\lib'
 		SetOverwrite try
-		File '${VC_INSTALL_PATH}\\\\redist\\\\Debug_NonRedist\\\\x86\\\\Microsoft.VC90.DebugCRT\\\\*.*'
+		#File '${VC_INSTALL_PATH}\\\\redist\\\\Debug_NonRedist\\\\x86\\\\Microsoft.VC90.DebugCRT\\\\*.*'
+		${VC_RUNTIME_REDIST_FILES}
 	")
 	SET(CPACK_NSIS_EXTRA_UNINSTALL_COMMANDS "
 		Delete '\$INSTDIR\\\\IoLanguageWebSite.url'
@@ -150,7 +154,7 @@ IF(WIN32 AND NOT CYGWIN)
 		Delete '\$SMPROGRAMS\\\\$MUI_TEMP\\\\IoLanguage Web Site.lnk'
 	")
 	SET(CPACK_NSIS_DELETE_ICONS_EXTRA "Delete '\$DESKTOP\\\\Io CLI.lnk'")
-ENDIF(WIN32 AND NOT CYGWIN)
+ENDIF(WIN32)
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	SET(CPACK_SET_DESTDIR "ON")
