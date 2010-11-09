@@ -73,4 +73,9 @@ IoObject *IoSocket_setNoDelay(IoSocket *self, IoObject *locals, IoMessage *m);
 IoObject *IoSocket_errorNumber(IoSocket *self, IoObject *locals, IoMessage *m);
 IoObject *IoSocket_errorDescription(IoSocket *self, IoObject *locals, IoMessage *m);
 
+IoObject *IoSocket_family(IoSocket *self, IoObject *locals, IoMessage *m);
+IoObject *IoSocket_setFamily(IoSocket *self, IoObject *locals, IoMessage *m);
+
+IoObject *IoSocket_fromFd(IoSocket *self, IoObject *locals, IoMessage *m);
+
 #endif

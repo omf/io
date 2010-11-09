@@ -67,11 +67,11 @@ DNSServer := Object clone do(
 			debugWriteln("DNSServer ", host, " request: ", hostName)
 			socket := Socket clone setHost(host) ifError(continue) setPort(53) setReadTimeout(timeout)
 			socket udpOpen ifError(continue)
-			ipAddress := socket ipAddress
+			ipAddress := socket address address
 			debugWriteln("DNSServer ipForHostName(", hostName, ") sending udp query packet to ipAddress: ", ipAddress ip, " on port ", ipAddress port)
 			packet := DNS dnsQueryPacketForHostName(hostName)
 			debugWriteln("writing packet")
-			socket udpWrite(ipAddress, packet, 0, packet size) ifError(continue)
+			socket udpWrite(socket address, packet, 0, packet size) ifError(continue)
 
 			coroId := Scheduler currentCoroutine label
 			debugWriteln(coroId, " reading DNS packet")
