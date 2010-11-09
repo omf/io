@@ -35,6 +35,7 @@ ChatServer clients := List clone
 ChatServer init := method(self clients := List clone)
 
 ChatServer handleSocket := method(aSocket,
+  aSocket message println
   write("[Accepted connection from ", aSocket host, "]\n")
   client := ChatClient clone
   clients append(client)

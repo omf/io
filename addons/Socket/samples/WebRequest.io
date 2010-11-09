@@ -8,8 +8,8 @@ ip := Host clone setName("www.yahoo.com") address
 socket := Socket clone setHost(ip) setPort(80)
 socket connect
 
-if (socket error) then (
-	writeln(socket error)
+if (socket isError) then (
+	writeln(socket message)
 ) else (
 	socket write("GET /\n\n")
 

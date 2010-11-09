@@ -38,6 +38,11 @@ if(EVENT_FOUND)
 		"${CMAKE_CURRENT_SOURCE_DIR}/source/IoIPAddress.c"
 		"${CMAKE_CURRENT_SOURCE_DIR}/source/IoSocket.c"
 		"${CMAKE_CURRENT_SOURCE_DIR}/source/IoSocketInit.c"
+
+		"${CMAKE_CURRENT_SOURCE_DIR}/source/UnixPath.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/source/IoUnixPath.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/source/Address.c"
+		"${CMAKE_CURRENT_SOURCE_DIR}/source/IoAddressFamily.c"
 	)
 
 	set(LIBS "")

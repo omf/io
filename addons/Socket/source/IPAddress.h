@@ -50,6 +50,8 @@ struct sockaddr *IPAddress_sockaddr(IPAddress *self);
 socklen_t IPAddress_size(IPAddress *self);
 void IPAddress_setSize_(IPAddress *self, socklen_t size);
 
+uint16_t IPAddress_family(IPAddress *self);
+
 // ip
 
 void IPAddress_setIp_(IPAddress *self, char *ip);

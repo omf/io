@@ -33,7 +33,7 @@ the host attribute. Returns self.
 */
 
 #include "IoSocket.h"
-#include "IoIPAddress.h"
+#include "IoAddressFamily.h"
 #include "IoState.h"
 #include "IoNumber.h"
 #include "IoSeq.h"
@@ -116,6 +116,11 @@ IoSocket *IoSocket_proto(void *state)
 		{"errorNumber", IoSocket_errorNumber},
 		{"errorDescription", IoSocket_errorDescription},
 
+		{"family", IoSocket_family},
+		{"setFamily", IoSocket_setFamily},
+		
+		{"fromFd", IoSocket_fromFd},
+		
 		{NULL, NULL}
 		};
 		IoObject_addMethodTable_(self, methodTable);
@@ -255,7 +260,7 @@ IoObject *IoSocket_asyncConnect(IoSocket *self, IoObject *locals, IoMessage *m)
 {
 	//doc Socket asyncConnect(ipAddressObject) Connects to the given IPAddress and returns self or an Error object on error.
 	
-	IPAddress *address = IoMessage_locals_rawIPAddressArgAt_(m, locals, 0);
+	Address *address = IoMessage_locals_rawAddressArgAt_(m, locals, 0);
 	
 	if (Socket_connectTo(SOCKET(self), address))
 	{
@@ -302,8 +307,8 @@ IoObject *IoSocket_asyncBind(IoSocket *self, IoObject *locals, IoMessage *m)
 {
 	//doc Socket asyncBind Binds the socket and returns self immediately or an Error object on error.
 
-	IPAddress *address = IoMessage_locals_rawIPAddressArgAt_(m, locals, 0);
-	
+	Address *address = IoMessage_locals_rawAddressArgAt_(m, locals, 0);
+
 	if (Socket_bind(SOCKET(self), address))
 	{
 		return self;
@@ -332,9 +337,9 @@ IoObject *IoSocket_asyncAccept(IoSocket *self, IoObject *locals, IoMessage *m)
 {
 	//doc Socket asyncAccept(ipAddressObject) Immediately returns a socket for a connection if one is available or nil otherwise. Returns an Error object on error.
 
-	IPAddress *address = IoMessage_locals_rawIPAddressArgAt_(m, locals, 0);
+	Address *address = IoMessage_locals_rawAddressArgAt_(m, locals, 0);
 	Socket *socket = Socket_accept(SOCKET(self), address);
-	
+
 	if (socket)
 	{
 		IoObject *newSocket = IoSocket_newWithSocket_(IOSTATE, socket);
@@ -435,7 +440,7 @@ IoObject *IoSocket_asyncUdpRead(IoSocket *self, IoObject *locals, IoMessage *m)
 	Returns self immediately if successful. Returns an error object on Error. Returns nil if the socket is disconnected.
 	*/
 	
-	IPAddress *address = IoMessage_locals_rawIPAddressArgAt_(m, locals, 0);
+	Address *address = IoMessage_locals_rawAddressArgAt_(m, locals, 0);
 	UArray *buffer = IoSeq_rawUArray(IoMessage_locals_mutableSeqArgAt_(m, locals, 1));
 	size_t readSize = IoMessage_locals_sizetArgAt_(m, locals, 2);
 	
@@ -463,7 +468,7 @@ IoObject *IoSocket_asyncUdpWrite(IoSocket *self, IoObject *locals, IoMessage *m)
 	Returns self immediately if successful. Returns an error object on Error. Returns nil if the socket is disconnected.
 	*/
 	
-	IPAddress *address = IoMessage_locals_rawIPAddressArgAt_(m, locals, 0);
+	Address *address = IoMessage_locals_rawAddressArgAt_(m, locals, 0);
 	UArray *buffer = IoSeq_rawUArray(IoMessage_locals_seqArgAt_(m, locals, 1));
 	size_t start = IoMessage_locals_intArgAt_(m, locals, 2);
 	size_t writeSize = IoMessage_locals_intArgAt_(m, locals, 3);
@@ -596,3 +601,34 @@ IoObject *IoSocket_errorDescription(IoSocket *self, IoObject *locals, IoMessage 
 
 	return IOSYMBOL(Socket_errorDescription());
 }
+
+IoObject *IoSocket_family(IoSocket *self, IoObject *locals, IoMessage *m)
+{
+	return IONUMBER(SOCKET(self)->af);
+}
+
+IoObject *IoSocket_setFamily(IoSocket *self, IoObject *locals, IoMessage *m)
+{
+	SOCKET(self)->af = CNUMBER(IoMessage_locals_numberArgAt_(m, locals, 0));
+	return self;
+}
+
+IoObject *IoSocket_fromFd(IoSocket *self, IoObject *locals, IoMessage *m)
+{
+	Socket *newSocketData = NULL;
+	//IoObject *newSocket = IoSocket_new(IOSTATE);
+	IoObject *newSocket = IoState_doCString_(IOSTATE, "Socket clone");
+	
+	newSocketData = SOCKET(newSocket);
+	newSocketData->fd = CNUMBER(IoMessage_locals_numberArgAt_(m, locals, 0));
+	newSocketData->af = CNUMBER(IoMessage_locals_numberArgAt_(m, locals, 1));
+	
+	if(Socket_makeReusable(newSocketData) && Socket_makeAsync(newSocketData)) {
+		IoSocket_rawSetupEvents(newSocket, locals, m);
+		return newSocket;
+	}
+	else {
+		return SOCKETERROR("Failed to create socket from existing fd");
+	}
+}
+
