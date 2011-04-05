@@ -137,9 +137,10 @@ SET(CMD_DATE "${CMD_DATE_YEAR}.${CMD_DATE_MON}.${CMD_DATE_DAY}")
 
 IF(WIN32 AND NOT CYGWIN)
 	execute_process(COMMAND "cmd" " /C git rev-parse --short HEAD" OUTPUT_VARIABLE IO_GIT_REV)
+ELSE(WIN32 AND NOT CYGWIN)
+	execute_process(COMMAND git rev-parse --short HEAD OUTPUT_VARIABLE IO_GIT_REV)
 ENDIF(WIN32 AND NOT CYGWIN)
 string(REGEX REPLACE "(.......)." "\\1" IO_GIT_REV ${IO_GIT_REV})
-message("------------------${IO_GIT_REV}-------------------")
 
 SET(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 SET(CPACK_PACKAGE_VENDOR "iolanguage.com")
