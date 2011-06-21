@@ -1846,24 +1846,20 @@ IO_METHOD(IoSeq, unpack)
 				
 				case 's': //string
 				{
+					char *uap = NULL;
 					UArray *ua = UArray_new();
-					char *uap = (char *)ua->data;
 					UArray_setItemType_(ua, CTYPE_uint8_t);
 					UArray_setEncoding_(ua, CENCODING_ASCII);
 					
 					if(count == 1) {
-						//while(c = UArray_longAt_(selfUArray, seqPos ++)) {
-						//	UArray_appendLong_(ua, c);
-						//}
 						count = strlen(&selfUArray[seqPos]);
 						UArray_setSize_(ua, count);
+						uap = (char *)ua->data;
 						strcpy(uap, &selfUArray[seqPos]);
 					}
 					else {
-						//for( ; count > 0 ; count --) {
-						//	UArray_appendLong_(ua, UArray_longAt_(selfUArray, seqPos ++));
-						//}
 						UArray_setSize_(ua, count);
+						uap = (char *)ua->data;
 						memcpy(uap, &selfUArray[seqPos], count);
 					}
 					seqPos += count;
